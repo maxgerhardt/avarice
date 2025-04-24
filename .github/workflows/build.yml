@@ -8,7 +8,7 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MSYS
@@ -57,14 +57,14 @@ jobs:
         run: |
           avarice_installed/usr/bin/avarice --version
           avarice_installed/usr/bin/avarice --known-devices || true
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AVaRICE Windows 64-bit
           path: avarice_installed
   build-lin64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y build-essential make autotools-dev automake binutils-dev libusb-dev libhidapi-dev
       - name: Build AVaRICE
@@ -82,14 +82,14 @@ jobs:
           avarice_installed/usr/local/bin/avarice --known-devices || true
       - name: Tar files
         run: tar -cvf avarice.tar.gz -C avarice_installed .
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: AVaRICE Linux 64-bit
           path: avarice.tar.gz
-  build-darwin-x64:
+  build-darwin-arm64:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Dependencies
         run: | 
           brew install gcc binutils autoconf automake mk-configure libusb libusb-compat hidapi
@@ -108,7 +108,7 @@ jobs:
           avarice_installed/usr/local/bin/avarice --known-devices || true
       - name: Tar files
         run: tar -cvf avarice.tar.gz -C avarice_installed .
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: AVaRICE Mac OS Intel 64-bit
+          name: AVaRICE Mac OS ARM 64-bit
           path: avarice.tar.gz
