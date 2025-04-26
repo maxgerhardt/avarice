@@ -96,11 +96,21 @@ jobs:
       - name: Build AVaRICE
         run: |
           ./Bootstrap
+          # note: we use a constant hidapi include path instead of "pkg-config --cflags hidapi" because that path include  "/hidapi" at the end
+          # through which in turn "hidapi/hidapi.h" will not be found (it would have to be just "hidapi.h").
+          export CFLAGS="$(pkg-config --cflags libusb) $(pkg-config --cflags libusb-1.0) -I/opt/homebrew/Cellar/hidapi/0.14.0/include/"
+          export CXXFLAGS="$(pkg-config --cflags libusb) $(pkg-config --cflags libusb-1.0) -I/opt/homebrew/Cellar/hidapi/0.14.0/include/"
+          export LDFLAGS="$(pkg-config --libs-only-L libusb) $(pkg-config --libs-only-L libusb-1.0) $(pkg-config --libs-only-L hidapi)"
           ./configure
           make -j3
           mkdir avarice_installed
           make install DESTDIR=$(pwd)/avarice_installed/
           ls -R avarice_installed
+          otool -L avarice_installed/usr/local/bin/avarice
+          install_name_tool -change /opt/homebrew/opt/hidapi/lib/libhidapi.0.dylib @executable_path/./libhidapi.0.dylib ./avarice_installed/usr/local/bin/avarice
+          install_name_tool -change /opt/homebrew/opt/libusb-compat/lib/libusb-0.1.4.dylib @executable_path/./libusb-0.1.4.dylib ./avarice_installed/usr/local/bin/avarice
+          cp /opt/homebrew/opt/hidapi/lib/libhidapi.0.dylib ./avarice_installed/usr/local/bin/.
+          cp /opt/homebrew/opt/libusb-compat/lib/libusb-0.1.4.dylib ./avarice_installed/usr/local/bin/.
           otool -L avarice_installed/usr/local/bin/avarice
       - name: Run AVaRICE
         run: |
